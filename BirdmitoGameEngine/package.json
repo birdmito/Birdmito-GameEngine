@@ -1,0 +1,15 @@
+{
+  "name": "birdmito_gameengine",
+  "version": "1.0.0",
+  "description": "my gameengine learning",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite"
+  },
+  "author": "Birdmito_DingYusi",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.8.4",
+    "vite": "^3.2.2"
+  }
+}
