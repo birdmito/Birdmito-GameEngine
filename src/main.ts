@@ -43,25 +43,25 @@ function isPointInRectangle(point: Point, rect: Rectangle) {
         point.y <= rect.y + rect.height
     );
 }
-function Move(e: { clientX: any; clientY: any; }) {
-    console.log(e.clientX, e.clientY);
-    const point = { x: e.clientX, y: e.clientY };
+// function Move(e: { clientX: any; clientY: any; }) {
+//     console.log(e.clientX, e.clientY);
+//     const point = { x: e.clientX, y: e.clientY };
 
-    //判断是否点击了对象
-    for (let i = RenderList.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
-        const RenderObject = RenderList[i];
-        const Bounds = RenderObject.getBounds();
+//     //判断是否点击了对象
+//     for (let i = rootDisplayObject.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
+//         const RenderObject = rootDisplayObject[i];
+//         const Bounds = RenderObject.getBounds();
 
-        if (isPointInRectangle(point, Bounds)) {
-            if (RenderObject.onClick) {
-                RenderObject.onClick();
-            }
+//         if (isPointInRectangle(point, Bounds)) {
+//             if (RenderObject.onClick) {
+//                 RenderObject.onClick();
+//             }
 
-            break;
-        }
+//             break;
+//         }
 
-    }
-}
+//     }
+// }
 
 
 //定义基类
@@ -183,7 +183,7 @@ class GameEngine {
     onUpdate: Function | undefined;     //游戏逻辑
     Startup: Function | undefined;
     async start() {
-        window.addEventListener("click", Move)
+        //window.addEventListener("click", Move)
 
         const imageList = ["./images/meme.jpg"];
         for (const item of imageList) {
@@ -209,9 +209,10 @@ class GameEngine {
         }
 
         //执行引擎逻辑
-        for (const RenderObject of RenderList) {
-            RenderObject.draw(context);
-        }
+        rootDisplayObject.draw(context);
+        // for (const RenderObject of rootDisplayObject) {
+        //     RenderObject.draw(context);
+        // }
 
         //绘制边框
         context.setTransform(1, 0, 0, 1, 0, 0);  //重置矩阵
@@ -263,7 +264,7 @@ container.addChild(bitmap2);
 container.addChild(text1);
 container.addChild(text2);
 container.rotation = 45;
-const RenderList = [container];
+const rootDisplayObject = container;
 
 
 //游戏引擎实例
