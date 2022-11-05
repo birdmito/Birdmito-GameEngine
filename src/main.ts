@@ -1,4 +1,4 @@
-import { Matrix, matrixAppendMatrix, Point, Rectangle } from "./math";
+import { Matrix, matrixAppendMatrix, Point, Rectangle, isPointInRectangle, matrixInvert, pointAppendMatrix } from "./math";
 
 //获取画布
 const canvas = document.getElementById("game") as HTMLCanvasElement;
@@ -34,34 +34,28 @@ function DrawGraphics() {
 }
 
 
-//鼠标点击判断
-function isPointInRectangle(point: Point, rect: Rectangle) {
-    return (
-        point.x >= rect.x &&
-        point.x <= rect.x + rect.width &&
-        point.y >= rect.y &&
-        point.y <= rect.y + rect.height
-    );
+
+function Move(e: { clientX: any; clientY: any; }, rootDisplayObject: GameObject) {
+    console.log(e.clientX, e.clientY);
+    const point = { x: e.clientX, y: e.clientY };
+    const hitTestResult = rootDisplayObject.hitTest(point);
+    if (hitTestResult) {
+        hitTestResult.onClick && hitTestResult.onClick();
+    }
+    //判断是否点击了对象
+    // for (let i = rootDisplayObject.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
+    //     const RenderObject = rootDisplayObject[i];
+    //     const Bounds = RenderObject.getBounds();
+
+    //     if (isPointInRectangle(point, Bounds)) {
+    //         if (RenderObject.onClick) {
+    //             RenderObject.onClick();
+    //         }
+
+    //         break;
+    //     }
+    // }
 }
-// function Move(e: { clientX: any; clientY: any; }) {
-//     console.log(e.clientX, e.clientY);
-//     const point = { x: e.clientX, y: e.clientY };
-
-//     //判断是否点击了对象
-//     for (let i = rootDisplayObject.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
-//         const RenderObject = rootDisplayObject[i];
-//         const Bounds = RenderObject.getBounds();
-
-//         if (isPointInRectangle(point, Bounds)) {
-//             if (RenderObject.onClick) {
-//                 RenderObject.onClick();
-//             }
-
-//             break;
-//         }
-
-//     }
-// }
 
 
 //定义基类
@@ -90,8 +84,8 @@ class GameObject {
         }
     }
 
-    //声明共有函数
-    draw(context: CanvasRenderingContext2D) {   //绘制函数
+    //绘制函数
+    draw(context: CanvasRenderingContext2D) {
         //更新矩阵
         this.localMatrix.updateFromTransformProperties(
             this.x,
@@ -120,10 +114,28 @@ class GameObject {
             child.draw(context);
         }
     };
+
+    //点击方法
     onClick: Function | undefined;        //点击判断
+    hitTest(point: Point): GameObject | null {   //点击判断
+        for (let i = this.children.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
+            const child = this.children[i];
+            const invertChildMatrix = matrixInvert(child.localMatrix);
+            const pointInLocal = pointAppendMatrix(point, invertChildMatrix);
+            const hitTestResult = child.hitTest(pointInLocal);
+            if (hitTestResult) {
+                return hitTestResult;
+            }
+        }
+        const bounds = this.getBounds();
+        if (isPointInRectangle(point, bounds)) {
+            return this;
+        }
+        return null;
+    }
     getBounds()     //获取边界（多态）
     {
-        return { x: this.x, y: this.y, width: 0, height: 0 };
+        return { x: 0, y: 0, width: 0, height: 0 };     //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
     }
 }
 
@@ -142,8 +154,8 @@ class Bitmap extends GameObject {
     getBounds() {
         const texture = imageCache.get(this.image);
         return {
-            x: this.x,
-            y: this.y,
+            x: 0,       //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
+            y: 0,
             width: texture.width,
             height: texture.height,
         };
@@ -169,8 +181,8 @@ class TextField extends GameObject {
     }
     getBounds() {
         return {
-            x: this.x,
-            y: this.y,
+            x: 0,       //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
+            y: 0,
             width: this.textWidth,
             height: 30,
         };
@@ -180,10 +192,28 @@ class TextField extends GameObject {
 
 //定义游戏引擎类
 class GameEngine {
+    rootDisplayObject = new GameObject();   //根对象
     onUpdate: Function | undefined;     //游戏逻辑
     Startup: Function | undefined;
     async start() {
-        //window.addEventListener("click", Move)
+        window.addEventListener("click", (e) => {
+            console.log(e.clientX, e.clientY);
+            const point = { x: e.clientX, y: e.clientY };
+            const hitTestResult = this.rootDisplayObject.hitTest(point);
+            let current = hitTestResult;
+            //scene
+            // A
+            // |-- B
+            // |--|-- C
+            // |-- D
+            //冒泡机制,点击C，会触发C，B，A，scene的点击事件
+            while (current) {
+                if (current.onClick) {
+                    current.onClick();
+                }
+                current = current.parent;
+            }
+        });
 
         const imageList = ["./images/meme.jpg"];
         for (const item of imageList) {
@@ -209,7 +239,7 @@ class GameEngine {
         }
 
         //执行引擎逻辑
-        rootDisplayObject.draw(context);
+        this.rootDisplayObject.draw(context);
         // for (const RenderObject of rootDisplayObject) {
         //     RenderObject.draw(context);
         // }
@@ -264,17 +294,18 @@ container.addChild(bitmap2);
 container.addChild(text1);
 container.addChild(text2);
 container.rotation = 45;
-const rootDisplayObject = container;
+container.onClick = () => {
+    console.log("container-click");
+}
 
 
 //游戏引擎实例
 const gameEngine = new GameEngine();
-
+gameEngine.rootDisplayObject.addChild(container);       //将容器添加到根对象中
 //开始时调用
 gameEngine.Startup = function () {
     console.log("Hello world");
 }
-
 //每帧调用
 gameEngine.onUpdate = function () {
     console.log("enter frame");

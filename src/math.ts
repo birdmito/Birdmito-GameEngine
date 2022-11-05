@@ -47,7 +47,7 @@ export type Rectangle = {
     height: number;
 }
 
-//m1 * m2
+//m2 * m1
 export function matrixAppendMatrix(m1: Matrix, m2: Matrix) {
     const result = new Matrix();
     result.a = m1.a * m2.a + m1.b * m2.c;
@@ -89,4 +89,14 @@ export function pointAppendMatrix(p: Point, m: Matrix) {
     result.y = p.x * m.b + p.y * m.d + m.ty;
 
     return result;
+}
+
+//鼠标点击判断
+export function isPointInRectangle(point: Point, rect: Rectangle) {
+    return (
+        point.x >= rect.x &&
+        point.x <= rect.x + rect.width &&
+        point.y >= rect.y &&
+        point.y <= rect.y + rect.height
+    );
 }

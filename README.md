@@ -10,8 +10,12 @@
 1. 将开发语言转换为TypeScript  
 2. 引入了vite  
 3. 通过localMatrix和globalMatrix的矩阵乘法实现了局部坐标系和全局坐标系转换  
-4. 实现了通过git提交代码  
-5. README文件  
+4. 引入Container，通过多叉树的结构组织GameObject的层级关系  
+5. 在render时通过遍历多叉树实现了GameObject的渲染  
+6. 将点击事件的反向遍历重构为多叉树的遍历方法，并通过局部坐标系的转换修正了点击事件的范围  
+8. 点击事件的捕获冒泡机制  
+9. 实现了通过git提交代码  
+10. README文件  
 
 #### 参与贡献
 
