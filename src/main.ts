@@ -32,9 +32,6 @@ function DrawGraphics() {
     //context.fill();
 
 }
-
-
-
 function Move(e: { clientX: any; clientY: any; }, rootDisplayObject: GameObject) {
     console.log(e.clientX, e.clientY);
     const point = { x: e.clientX, y: e.clientY };
@@ -42,23 +39,11 @@ function Move(e: { clientX: any; clientY: any; }, rootDisplayObject: GameObject)
     if (hitTestResult) {
         hitTestResult.onClick && hitTestResult.onClick();
     }
-    //判断是否点击了对象
-    // for (let i = rootDisplayObject.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
-    //     const RenderObject = rootDisplayObject[i];
-    //     const Bounds = RenderObject.getBounds();
-
-    //     if (isPointInRectangle(point, Bounds)) {
-    //         if (RenderObject.onClick) {
-    //             RenderObject.onClick();
-    //         }
-
-    //         break;
-    //     }
-    // }
 }
 
 
-//定义基类
+//游戏对象类（GameObject...）
+//-----------------------------------------------------------------
 class GameObject {
     //初始Transform信息
     x = 0;
@@ -70,6 +55,7 @@ class GameObject {
     globalMatrix = new Matrix();        //全局矩阵
     parent: GameObject | null = null;   //父对象
     children: GameObject[] = [];   //子对象
+    private behaviours: Behaviour[] = [];    //Behavior组件组
 
     //多叉树方法
     addChild(child: GameObject) {   //添加子对象
@@ -84,8 +70,19 @@ class GameObject {
         }
     }
 
+    //添加Behavior组件（把变化的与不变化的分开，从子类中共通的提取到基类中）
+    addBehaviour(behaviour: Behaviour) {
+        this.behaviours.push(behaviour);
+        behaviour.run(this);
+    }
+
     //绘制函数
     draw(context: CanvasRenderingContext2D) {
+
+        for (const behaviour of this.behaviours) {
+            behaviour.update();
+        }
+
         //更新矩阵
         this.localMatrix.updateFromTransformProperties(
             this.x,
@@ -191,6 +188,7 @@ class TextField extends GameObject {
 }
 
 //定义游戏引擎类
+//------------------------------------------------------------
 class GameEngine {
     rootDisplayObject = new GameObject();   //根对象
     onUpdate: Function | undefined;     //游戏逻辑
@@ -253,7 +251,49 @@ class GameEngine {
 
 }
 
-//定义render动画函数
+//Unity-like架构：采取组合优先原则，Behaviour是组件，GameObject是实体
+//---------------------------------------------------------------
+class Behaviour {
+    gameObject!: GameObject;
+    run(gameObject: GameObject) {
+        this.gameObject = gameObject;
+        this.start();
+    }
+    start() { }
+    update() { }
+}
+class MoveWhenClickBehaviour extends Behaviour {
+    isClick = false;
+    velocity = 1;
+    currentVelocity = 0;
+
+    start(): void {
+        this.gameObject.onClick = () => {
+            console.log("Clickable");
+            this.isClick = true;
+            this.currentVelocity = this.velocity;
+        }
+    }
+    update() {
+        if (this.isClick) {
+            this.gameObject.x += this.currentVelocity;
+        }
+    }
+}
+class RotateBehaviour extends Behaviour {
+    velocity = 0;
+    currentVelocity = 0;
+
+    start(): void {
+        this.currentVelocity = this.velocity;
+    }
+    update() {
+        this.gameObject.rotation += this.currentVelocity;
+    }
+}
+
+//游戏场景内容
+//---------------------------------------------------------------
 let MoveRange = 0;
 let MoveDist = 1;
 let isStarted = false;
@@ -277,10 +317,13 @@ bitmap2.onClick = () => {
     console.log("image2-click");
 }
 const text1 = new TextField();
-text1.text = "BJUT";
-text1.onClick = () => {
-    console.log("text1-click");
-}
+text1.text = "MainRole";
+const move1 = new MoveWhenClickBehaviour();     //实例以调整速度
+move1.velocity = 2;
+const rotate1 = new RotateBehaviour();        //实例以调整速度
+rotate1.velocity = 2;
+text1.addBehaviour(move1);    //添加组件
+text1.addBehaviour(rotate1);    //添加组件
 const text2 = new TextField();
 text2.x = text2.y = 658;
 text2.text = "Birdmito";
@@ -288,18 +331,19 @@ text2.onClick = () => {
     console.log("text2-click");
 }
 
-const container = new GameObject();
+const container = new GameObject();  //容器可以包含多个子物体（类似于Unity空父级物体）
 container.addChild(bitmap1);
 container.addChild(bitmap2);
 container.addChild(text1);
 container.addChild(text2);
-container.rotation = 45;
+container.rotation = 0;
 container.onClick = () => {
     console.log("container-click");
 }
 
 
 //游戏引擎实例
+//---------------------------------------------------------------
 const gameEngine = new GameEngine();
 gameEngine.rootDisplayObject.addChild(container);       //将容器添加到根对象中
 //开始时调用
@@ -324,4 +368,5 @@ gameEngine.onUpdate = function () {
 }
 
 //实例开始运行
+//---------------------------------------------------------------
 gameEngine.start();

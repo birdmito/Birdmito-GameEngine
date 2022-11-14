@@ -16,6 +16,13 @@
 8. 点击事件的捕获冒泡机制  
 9. 实现了通过git提交代码  
 10. README文件  
+##### 2022.11.14
+学习了第八周代码内容  
+1. 将引擎从Flash-like架构转换为Unity-like架构  
+2. 通过桥梁模式采取组合优先的方式实现了GameObject的游戏逻辑Behaviour组件化  
+3. 新建exampleBehaviour,在'游戏场景内容'中通过调用物体的addBehaviour添加新的Behaviour组件  
+4. 实现了MoveWhenClickBehaviour，通过点击物体实现物体的移动  
+5. 实现了RotateBehaviour，实现物体的旋转  
 
 #### 参与贡献
 
