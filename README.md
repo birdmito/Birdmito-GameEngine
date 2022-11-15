@@ -23,6 +23,20 @@
 3. 新建exampleBehaviour,在'游戏场景内容'中通过调用物体的addBehaviour添加新的Behaviour组件  
 4. 实现了MoveWhenClickBehaviour，通过点击物体实现物体的移动  
 5. 实现了RotateBehaviour，实现物体的旋转  
+##### 2022.11.15
+学习了第九周代码内容  
+1. 将引擎逻辑从main.ts中分离出来，新建engine.ts，将引擎的初始化和游戏逻辑的初始化分离  
+2. gameEngine不再提供回调函数onUpdate写游戏逻辑，而是通过Behaviour类的update来实现游戏逻辑  
+3. 将Behaviour类的run方法重构到GameObject类的addBehaviour方法中  
+4. 将所有游戏逻辑都放到了Behaviour中实现  
+
+#### 使用说明
+##### 依赖
+1. node.js  
+2. npm  
+3. vite  
+4. typescript  
+5. TSC  
 
 #### 参与贡献
 
