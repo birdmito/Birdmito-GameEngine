@@ -29,6 +29,11 @@
 2. gameEngine不再提供回调函数onUpdate写游戏逻辑，而是通过Behaviour类的update来实现游戏逻辑  
 3. 将Behaviour类的run方法重构到GameObject类的addBehaviour方法中  
 4. 将所有游戏逻辑都放到了Behaviour中实现  
+5. 进行微内核改造，将引擎结构方式重构为游戏结构方式（Behaviour）  
+   ·GameObject的变换由Transform实现  
+   ·GameObject的渲染由Renderer实现  
+   ·Renderer的getBounds采用多态的方式实现  
+6. 由于draw已经在组件的onUpdate中实现，将GameObject的draw方法重构为onUpdate  
 
 #### 使用说明
 ##### 依赖

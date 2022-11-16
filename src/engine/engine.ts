@@ -39,17 +39,15 @@ function DrawGraphics() {
 //游戏对象类（GameObject...）
 //-----------------------------------------------------------------
 export class GameObject {
-    //初始Transform信息
-    x = 0;
-    y = 0;
-    scaleX = 1;
-    scaleY = 1;
-    rotation = 0;  //旋转度数
-    localMatrix = new Matrix();     //局部矩阵
-    globalMatrix = new Matrix();        //全局矩阵
     parent: GameObject | null = null;   //父对象
     children: GameObject[] = [];   //子对象
     private behaviours: Behaviour[] = [];    //Behavior组件组
+    renderer: RendererBehaviour | null = null;      //渲染器
+    onClick: Function | undefined;        //点击判断
+
+    constructor() {
+        this.addBehaviour(new Transform());
+    }
 
     //多叉树方法
     addChild(child: GameObject) {   //添加子对象
@@ -66,9 +64,30 @@ export class GameObject {
 
     //添加Behavior组件（把变化的与不变化的分开，从子类中共通的提取到基类中）
     addBehaviour(behaviour: Behaviour) {
+        if (behaviour instanceof RendererBehaviour) {   //判断是否是渲染器
+            this.renderer = behaviour;
+        }
         this.behaviours.push(behaviour);
         behaviour.gameObject = this;
         behaviour.onStart();
+    }
+    //是否有某个Behavior组件
+    hasBehaviour(behaviour: typeof Behaviour) {
+        for (const b of this.behaviours) {
+            if (b instanceof behaviour) {
+                return true;
+            }
+        }
+        return false;
+    }
+    //获取Behavior组件
+    getBehaviour<T extends typeof Behaviour>(behaviourClass: T): InstanceType<T> {    //根据类名获取Behavior组件
+        for (const behaviour of this.behaviours) {
+            if (behaviour instanceof behaviourClass) {    //判断是否是某个类的实例
+                return behaviour as InstanceType<T>;    //返回该类型实例
+            }
+        }
+        throw new Error('Behaviour ${behaviourClass.name} not found');
     }
     //删除Behavior组件
     removeBehaviour(behaviour: Behaviour) {
@@ -81,109 +100,38 @@ export class GameObject {
     }
 
     //绘制函数
-    draw(context: CanvasRenderingContext2D) {
+    onUpdate() {
 
+        //调用所有Behavior组件
         for (const behaviour of this.behaviours) {
             behaviour.onUpdate();
         }
 
-        //更新矩阵
-        this.localMatrix.updateFromTransformProperties(
-            this.x,
-            this.y,
-            this.scaleX,
-            this.scaleY,
-            this.rotation
-        );
-        //更新全局矩阵
-        if (this.parent) {
-            this.globalMatrix = matrixAppendMatrix(this.localMatrix, this.parent.globalMatrix);
-        } else {
-            this.globalMatrix = this.localMatrix;
-        }
-        //设置变换
-        context.setTransform(
-            this.globalMatrix.a,
-            this.globalMatrix.b,
-            this.globalMatrix.c,
-            this.globalMatrix.d,
-            this.globalMatrix.tx,
-            this.globalMatrix.ty
-        );
         //绘制子对象
         for (const child of this.children) {
-            child.draw(context);
+            child.onUpdate();
         }
     };
 
     //点击方法
-    onClick: Function | undefined;        //点击判断
     hitTest(point: Point): GameObject | null {   //点击判断
         for (let i = this.children.length - 1; i >= 0; i--) {    //画家算法，从后往前遍历
             const child = this.children[i];
-            const invertChildMatrix = matrixInvert(child.localMatrix);
+            const childTransform = child.getBehaviour(Transform);
+            const invertChildMatrix = matrixInvert(childTransform.localMatrix);
             const pointInLocal = pointAppendMatrix(point, invertChildMatrix);
             const hitTestResult = child.hitTest(pointInLocal);
             if (hitTestResult) {
                 return hitTestResult;
             }
         }
-        const bounds = this.getBounds();
+        const bounds = this.renderer ?      //判断是否有渲染器（三目运算符）
+            this.renderer.getBounds() : //获取渲染组件的边界（多态）
+            { x: 0, y: 0, width: 0, height: 0 }; //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
         if (isPointInRectangle(point, bounds)) {
             return this;
         }
         return null;
-    }
-    getBounds()     //获取边界（多态）
-    {
-        return { x: 0, y: 0, width: 0, height: 0 };     //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
-    }
-}
-//定义位图类
-export class Bitmap extends GameObject {
-    image: string = "";
-
-    //定义位图的函数
-    draw(context: CanvasRenderingContext2D) {
-        super.draw(context);    //调用父类的函数
-        const texture = imageCache.get(this.image);
-        if (texture) {
-            context.drawImage(texture, 0, 0);
-        }
-    }
-    getBounds() {
-        const texture = imageCache.get(this.image);
-        return {
-            x: 0,       //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
-            y: 0,
-            width: texture.width,
-            height: texture.height,
-        };
-    }
-}
-//定义文本类
-export class TextField extends GameObject {
-    //定义初始内容
-    text = "Hello world";
-    textWidth = 0;
-
-    //定义文本的绘制函数
-    draw(context: CanvasRenderingContext2D) {
-        super.draw(context);    //调用父类的函数
-        context.font = "30px Arial";
-        context.fillStyle = "#000000";
-        context.textAlign = "left";
-        //context.fillText(this.text, this.x, this.y + 30);  //未采用局部矩阵时需要加上偏移量
-        context.fillText(this.text, 0, 30);             //加入局部坐标，采用局部矩阵时不需要加上偏移量（W7:01:01:25）
-        this.textWidth = context.measureText(this.text).width;  //获取文本宽度
-    }
-    getBounds() {
-        return {
-            x: 0,       //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
-            y: 0,
-            width: this.textWidth,
-            height: 30,
-        };
     }
 }
 
@@ -200,6 +148,107 @@ export class Behaviour {
 
     //is called when the game is ended
     onEnd() { }
+}
+export class RendererBehaviour extends Behaviour {  //渲染器组件,提供getBounds方法实现子类的多态
+    getBounds() {
+        return { x: 0, y: 0, width: 0, height: 0 };
+    }
+}
+export class Transform extends Behaviour {
+    //初始Transform信息
+    x = 0;
+    y = 0;
+    scaleX = 1;
+    scaleY = 1;
+    rotation = 0;  //旋转度数
+
+    localMatrix = new Matrix();     //局部矩阵
+    globalMatrix = new Matrix();        //全局矩阵
+
+    onUpdate(): void {
+        //更新矩阵
+        this.localMatrix.updateFromTransformProperties(
+            this.x,
+            this.y,
+            this.scaleX,
+            this.scaleY,
+            this.rotation
+        );
+
+        const parent = this.gameObject.parent;
+        //更新全局矩阵
+        if (parent) {
+            const parentTransform = parent.getBehaviour(Transform); //获取父对象的Transform组件用于读取全局矩阵
+            this.globalMatrix = matrixAppendMatrix(this.localMatrix, parentTransform.globalMatrix);
+        } else {
+            this.globalMatrix = this.localMatrix;
+        }
+    }
+}
+export class BitmapRenderer extends RendererBehaviour {
+    image: string = "";
+
+    onUpdate(): void {
+        const transform = this.gameObject.getBehaviour(Transform);
+        //设置变换
+        context.setTransform(
+            transform.globalMatrix.a,
+            transform.globalMatrix.b,
+            transform.globalMatrix.c,
+            transform.globalMatrix.d,
+            transform.globalMatrix.tx,
+            transform.globalMatrix.ty
+        );
+
+        const texture = imageCache.get(this.image);
+        if (texture) {
+            context.drawImage(texture, 0, 0);
+        }
+    }
+
+    getBounds() {
+        const texture = imageCache.get(this.image);
+        return {
+            x: 0,       //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
+            y: 0,
+            width: texture.width,
+            height: texture.height,
+        };
+    }
+}
+export class TextRenderer extends RendererBehaviour {
+    //定义初始内容
+    text = "Hello world";
+    textWidth = 0;
+
+    onUpdate(): void {
+        const transform = this.gameObject.getBehaviour(Transform);
+        //设置变换
+        context.setTransform(
+            transform.globalMatrix.a,
+            transform.globalMatrix.b,
+            transform.globalMatrix.c,
+            transform.globalMatrix.d,
+            transform.globalMatrix.tx,
+            transform.globalMatrix.ty
+        );
+
+        context.font = "30px Arial";
+        context.fillStyle = "#000000";
+        context.textAlign = "left";
+        //context.fillText(this.text, this.x, this.y + 30);  //未采用局部矩阵时需要加上偏移量
+        context.fillText(this.text, 0, 30);             //加入局部坐标，采用局部矩阵时不需要加上偏移量（W7:01:01:25）
+        this.textWidth = context.measureText(this.text).width;  //获取文本宽度
+    }
+
+    getBounds() {
+        return {
+            x: 0,       //因为局部矩阵是相对于父对象的，所以这里返回的是相对于父对象的坐标，x/y都是0
+            y: 0,
+            width: this.textWidth,
+            height: 30,
+        };
+    }
 }
 
 //定义游戏引擎类
@@ -251,7 +300,7 @@ export class GameEngine {
         }
 
         //执行引擎逻辑
-        this.rootDisplayObject.draw(context);
+        this.rootDisplayObject.onUpdate();
         // for (const RenderObject of rootDisplayObject) {
         //     RenderObject.draw(context);
         // }
