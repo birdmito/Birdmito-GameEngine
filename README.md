@@ -34,6 +34,17 @@
    ·GameObject的渲染由Renderer实现  
    ·Renderer的getBounds采用多态的方式实现  
 6. 由于draw已经在组件的onUpdate中实现，将GameObject的draw方法重构为onUpdate  
+##### 2022.11.19
+学习了第十周代码内容
+1. 将游戏数据(data/behaviour)从游戏逻辑中分离出来，新建data.ts，供游戏策划使用  
+2. 在engine.ts中新增createGameObject方法，通过传入游戏数据来创建游戏物体  
+3. 通过registerBehaviour方法将data.ts的type映射成Behaviour类  
+4. 通过重构后，main.ts中的代码量大大减少，不再需要手动实例化behavior只需要调用createGameObject方法即可创建游戏物体 
+5. data.ts采用树形结构，在engine.ts通过递归的方式实现了多叉树的创建  
+6. 引入js-yaml库，通过yaml文件来存储并创建游戏物体，并将逻辑重构到GameEngine中成为引擎逻辑  
+7. 将各behavior从main.ts中分离成为单独的文件管理，每添加一个新的behavior都需要在main.ts中注册  
+8. 序列化（存储为yaml文件）和反序列化（读取yaml文件）  
+
 
 #### 使用说明
 ##### 依赖
@@ -42,6 +53,7 @@
 3. vite  
 4. typescript  
 5. TSC  
+6. js-yaml(npm install js-yaml,npm install @types/js-yaml)  
 
 #### 参与贡献
 

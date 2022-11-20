@@ -13,6 +13,10 @@
   "author": "Birdmito_DingYusi",
   "license": "ISC",
   "devDependencies": {
+    "@types/js-yaml": "^4.0.5",
     "vite": "^3.2.2"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0"
   }
 }

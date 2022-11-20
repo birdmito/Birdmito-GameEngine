@@ -6,10 +6,16 @@ import {
     Point,
     pointAppendMatrix
 } from "../math";
+import yaml from "js-yaml";
 
 //获取画布
 const canvas = document.getElementById("game") as HTMLCanvasElement;
 const context = canvas.getContext("2d")!;
+
+let behaviourMap = new Map<string, typeof Behaviour>();
+export function registerBehaviour(behaviour: typeof Behaviour) {
+    behaviourMap.set(behaviour.name, behaviour); //注册Behaviour
+}
 
 //定义图片缓存
 const imageCache = new Map();
@@ -22,6 +28,17 @@ function loadImage(url: string) {
             resolve();
         };
         image.src = url;
+    });
+}
+//定义加载文本函数
+function loadText(url: string) {
+    return new Promise<string>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        xhr.onload = () => {
+            resolve(xhr.responseText);
+        };
+        xhr.send();
     });
 }
 //定义绘制边框函数
@@ -216,6 +233,7 @@ export class BitmapRenderer extends RendererBehaviour {
         };
     }
 }
+
 export class TextRenderer extends RendererBehaviour {
     //定义初始内容
     text = "Hello world";
@@ -257,7 +275,8 @@ export class GameEngine {
     rootDisplayObject = new GameObject();   //根对象
     onUpdate: Function | undefined;     //游戏逻辑
     Startup: Function | undefined;
-    async start() {
+    async start(sceneUrl: string) {
+        //引擎启动->加载图片资源->加载场景->解析并创建场景->开始渲染
         window.addEventListener("click", (e) => {
             console.log(e.clientX, e.clientY);
             const point = { x: e.clientX, y: e.clientY };
@@ -277,10 +296,15 @@ export class GameEngine {
             }
         });
 
-        const imageList = ["./images/meme.jpg"];
-        for (const item of imageList) {
+        const imageList = ["./images/meme.jpg"];    //图片列表
+        for (const item of imageList) {    //加载图片
             await loadImage(item);
         }
+        const content = await loadText(sceneUrl);  //加载场景配置文件
+        //反序列化
+        const sceneData = yaml.load(content);    //解析场景配置文件
+        const rootContainer = createGameObject(sceneData);  //创建场景
+        this.rootDisplayObject.addChild(rootContainer);       //将容器添加到根对象中
 
         if (this.Startup) {
             this.Startup();
@@ -312,4 +336,24 @@ export class GameEngine {
         requestAnimationFrame(() => this.render());
     }
 
+}
+
+export function createGameObject(data: any): GameObject {       //封装
+    const gameObject = new GameObject();
+    for (const behaviourData of data.behaviours) {   //遍历创建behaviours
+        const className = behaviourData.type;
+        const behaviourClass = behaviourMap.get(className)!;        //多态
+        const behaviour = gameObject.hasBehaviour(behaviourClass) ?
+            gameObject.getBehaviour(behaviourClass) : new behaviourClass();  //如果已经存在该组件，则不再创建
+        for (const key in behaviourData.properties) {
+            (behaviour as any)[key] = behaviourData.properties[key];
+        }
+        gameObject.addBehaviour(behaviour);
+    }
+    for (const childData of data.children || []) {    //递归创建子对象,children可能不存在
+        const child = createGameObject(childData);
+        gameObject.addChild(child);
+    }
+    console.log(gameObject);
+    return gameObject;
 }
