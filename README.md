@@ -44,8 +44,12 @@
 6. 引入js-yaml库，通过yaml文件来存储并创建游戏物体，并将逻辑重构到GameEngine中成为引擎逻辑  
 7. 将各behavior从main.ts中分离成为单独的文件管理，每添加一个新的behavior都需要在main.ts中注册  
 8. 序列化（存储为yaml文件）和反序列化（读取yaml文件）  
-
-
+##### 2022.12.12
+学习了第十一周代码内容
+1. 实现所见即所得编辑器第一步：序列化和反序列化  
+2. 反序列化：text文本通过yaml.parse方法转化为json，再通过createGameObject方法创建游戏物体gameObject  
+3. 序列化：GameObject通过extractGameObject方法转化为json，再通过yaml.dump方法转化为text文本  
+4. 通过修饰符@SerializeField来标记需要序列化的属性  
 #### 使用说明
 ##### 依赖
 1. node.js  

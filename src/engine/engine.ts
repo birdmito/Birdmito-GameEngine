@@ -14,7 +14,7 @@ const context = canvas.getContext("2d")!;
 
 let behaviourMap = new Map<string, typeof Behaviour>();
 export function registerBehaviour(behaviour: typeof Behaviour) {
-    behaviourMap.set(behaviour.name, behaviour); //注册Behaviour
+    behaviourMap.set(behaviour.name.replace("_", ""), behaviour); //注册Behaviour
 }
 
 //定义图片缓存
@@ -58,7 +58,7 @@ function DrawGraphics() {
 export class GameObject {
     parent: GameObject | null = null;   //父对象
     children: GameObject[] = [];   //子对象
-    private behaviours: Behaviour[] = [];    //Behavior组件组
+    behaviours: Behaviour[] = [];    //Behavior组件组
     renderer: RendererBehaviour | null = null;      //渲染器
     onClick: Function | undefined;        //点击判断
 
@@ -171,12 +171,23 @@ export class RendererBehaviour extends Behaviour {  //渲染器组件,提供getB
         return { x: 0, y: 0, width: 0, height: 0 };
     }
 }
+
+export const SerializeField: PropertyDecorator = (target, key) => {  //装饰器，用于序列化
+    const targetConstructor = target.constructor as any;
+    targetConstructor.metadatas = targetConstructor.metadatas || [];
+    targetConstructor.metadatas.push({ key });
+}
 export class Transform extends Behaviour {
     //初始Transform信息
+    @SerializeField
     x = 0;
+    @SerializeField
     y = 0;
+    @SerializeField
     scaleX = 1;
+    @SerializeField
     scaleY = 1;
+    @SerializeField
     rotation = 0;  //旋转度数
 
     localMatrix = new Matrix();     //局部矩阵
@@ -203,6 +214,7 @@ export class Transform extends Behaviour {
     }
 }
 export class BitmapRenderer extends RendererBehaviour {
+    @SerializeField
     image: string = "";
 
     onUpdate(): void {
@@ -236,6 +248,7 @@ export class BitmapRenderer extends RendererBehaviour {
 
 export class TextRenderer extends RendererBehaviour {
     //定义初始内容
+    @SerializeField
     text = "Hello world";
     textWidth = 0;
 
@@ -300,8 +313,8 @@ export class GameEngine {
         for (const item of imageList) {    //加载图片
             await loadImage(item);
         }
-        const content = await loadText(sceneUrl);  //加载场景配置文件
         //反序列化
+        const content = await loadText(sceneUrl);  //加载场景配置文件
         const sceneData = yaml.load(content);    //解析场景配置文件
         const rootContainer = createGameObject(sceneData);  //创建场景
         this.rootDisplayObject.addChild(rootContainer);       //将容器添加到根对象中
@@ -336,6 +349,19 @@ export class GameEngine {
         requestAnimationFrame(() => this.render());
     }
 
+    serialize() {
+        const data = extractGameObject(this.rootDisplayObject.children[0]);
+        const text = yaml.dump(data,
+            {
+                'styles': {
+                    '!!null': 'canonical' // dump null as ~
+                },
+                noCompatMode: true,     //不使用兼容模式,解决y序列化后变成'y'的问题
+                //'sortKeys': true        // sort object keys
+            });
+
+        return text;
+    }
 }
 
 export function createGameObject(data: any): GameObject {       //封装
@@ -354,6 +380,28 @@ export function createGameObject(data: any): GameObject {       //封装
         const child = createGameObject(childData);
         gameObject.addChild(child);
     }
-    console.log(gameObject);
+    //console.log(gameObject);
     return gameObject;
+}
+export function extractGameObject(gameObject: GameObject): any {   //反序列化
+    const data: any = {
+        behaviours: [],
+        children: [],
+    };
+    for (const behaviour of gameObject.behaviours) {
+        const properties: any = {};
+        const behaviourConstructor = behaviour.constructor as any;
+        //console.log(behaviourConstructor.metadatas);
+        for (const metadata of behaviourConstructor.metadatas || []) {   //仅显示有@SerializeField的属性
+            properties[metadata.key] = (behaviour as any)[metadata.key];
+        }
+        data.behaviours.push({
+            type: behaviour.constructor.name.replace("_", ""),
+            properties,
+        });
+    }
+    for (const child of gameObject.children) {
+        data.children.push(extractGameObject(child));
+    }
+    return data;
 }

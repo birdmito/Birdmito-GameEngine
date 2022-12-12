@@ -23,3 +23,10 @@ registerBehaviour(LoopMoveBehaviour);
 //---------------------------------------------------------------
 const gameEngine = new GameEngine();
 gameEngine.start("./scene.yaml");
+
+window.addEventListener("keydown", (e) => {
+    if (e.key === " ") {
+        console.log("space");
+        console.log(gameEngine.serialize());
+    }
+});

@@ -1,9 +1,13 @@
-import { Behaviour, Transform } from "../engine/engine";
+import { Behaviour, SerializeField, Transform } from "../engine/engine";
 
 export class LoopMoveBehaviour extends Behaviour {
+    @SerializeField
     isClick = false;
+    @SerializeField
     velocity = 1;
+    @SerializeField
     moveRange = 1920 - 659; //移动范围 = 画布宽度 - 物体宽度
+    @SerializeField
     moveDistance = 0; //物体移动距离
 
     onStart(): void {
