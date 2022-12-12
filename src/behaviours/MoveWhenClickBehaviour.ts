@@ -1,11 +1,11 @@
-import { Behaviour, SerializeField, Transform } from "../engine/engine";
+import { Behaviour, SerializedNumber, Transform } from "../engine/engine";
 
 export class MoveWhenClickBehaviour extends Behaviour {
-    @SerializeField
+    //@SerializeField
     isClick = false;
-    @SerializeField
+    @SerializedNumber
     velocity = 1;
-    @SerializeField
+    @SerializedNumber
     currentVelocity = 0;
 
     onStart(): void {

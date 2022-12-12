@@ -49,7 +49,9 @@
 1. 实现所见即所得编辑器第一步：序列化和反序列化  
 2. 反序列化：text文本通过yaml.parse方法转化为json，再通过createGameObject方法创建游戏物体gameObject  
 3. 序列化：GameObject通过extractGameObject方法转化为json，再通过yaml.dump方法转化为text文本  
-4. 通过修饰符@SerializeField来标记需要序列化的属性  
+4. 通过修饰符@Serialized来标记需要序列化的属性  
+5. 反序列化时进行防御性编程，通过使用不同的修饰符（@SerializedNumber or @SerializedString）判断防止反序列化的数据类型和属性类型不匹配  
+6. 未完全解决两个Transform问题  
 #### 使用说明
 ##### 依赖
 1. node.js  

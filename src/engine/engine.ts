@@ -63,7 +63,7 @@ export class GameObject {
     onClick: Function | undefined;        //点击判断
 
     constructor() {
-        this.addBehaviour(new Transform());
+        //this.addBehaviour(new Transform());
     }
 
     //多叉树方法
@@ -172,22 +172,27 @@ export class RendererBehaviour extends Behaviour {  //渲染器组件,提供getB
     }
 }
 
-export const SerializeField: PropertyDecorator = (target, key) => {  //装饰器，用于序列化
+export const SerializedNumber: PropertyDecorator = (target, key) => {  //装饰器，用于序列化
     const targetConstructor = target.constructor as any;
     targetConstructor.metadatas = targetConstructor.metadatas || [];
-    targetConstructor.metadatas.push({ key });
+    targetConstructor.metadatas.push({ key, type: 'number' });
+}
+export const SerializedString: PropertyDecorator = (target, key) => {  //装饰器，用于序列化
+    const targetConstructor = target.constructor as any;
+    targetConstructor.metadatas = targetConstructor.metadatas || [];
+    targetConstructor.metadatas.push({ key, type: 'string' });
 }
 export class Transform extends Behaviour {
     //初始Transform信息
-    @SerializeField
+    @SerializedNumber
     x = 0;
-    @SerializeField
+    @SerializedNumber
     y = 0;
-    @SerializeField
+    @SerializedNumber
     scaleX = 1;
-    @SerializeField
+    @SerializedNumber
     scaleY = 1;
-    @SerializeField
+    @SerializedNumber
     rotation = 0;  //旋转度数
 
     localMatrix = new Matrix();     //局部矩阵
@@ -214,7 +219,7 @@ export class Transform extends Behaviour {
     }
 }
 export class BitmapRenderer extends RendererBehaviour {
-    @SerializeField
+    @SerializedString
     image: string = "";
 
     onUpdate(): void {
@@ -248,7 +253,7 @@ export class BitmapRenderer extends RendererBehaviour {
 
 export class TextRenderer extends RendererBehaviour {
     //定义初始内容
-    @SerializeField
+    @SerializedString
     text = "Hello world";
     textWidth = 0;
 
@@ -290,6 +295,7 @@ export class GameEngine {
     Startup: Function | undefined;
     async start(sceneUrl: string) {
         //引擎启动->加载图片资源->加载场景->解析并创建场景->开始渲染
+        this.rootDisplayObject.addBehaviour(new Transform());
         window.addEventListener("click", (e) => {
             console.log(e.clientX, e.clientY);
             const point = { x: e.clientX, y: e.clientY };
@@ -315,9 +321,7 @@ export class GameEngine {
         }
         //反序列化
         const content = await loadText(sceneUrl);  //加载场景配置文件
-        const sceneData = yaml.load(content);    //解析场景配置文件
-        const rootContainer = createGameObject(sceneData);  //创建场景
-        this.rootDisplayObject.addChild(rootContainer);       //将容器添加到根对象中
+        this.unserialize(content);  //解析场景配置文件
 
         if (this.Startup) {
             this.Startup();
@@ -349,7 +353,12 @@ export class GameEngine {
         requestAnimationFrame(() => this.render());
     }
 
-    serialize() {
+    unserialize(content: string) {
+        const sceneData = yaml.load(content);    //解析场景配置文件
+        const rootContainer = createGameObject(sceneData);  //创建场景
+        this.rootDisplayObject.addChild(rootContainer);       //将容器添加到根对象中
+    }
+    serialize(): string {
         const data = extractGameObject(this.rootDisplayObject.children[0]);
         const text = yaml.dump(data,
             {
@@ -369,10 +378,19 @@ export function createGameObject(data: any): GameObject {       //封装
     for (const behaviourData of data.behaviours) {   //遍历创建behaviours
         const className = behaviourData.type;
         const behaviourClass = behaviourMap.get(className)!;        //多态
-        const behaviour = gameObject.hasBehaviour(behaviourClass) ?
-            gameObject.getBehaviour(behaviourClass) : new behaviourClass();  //如果已经存在该组件，则不再创建
-        for (const key in behaviourData.properties) {
-            (behaviour as any)[key] = behaviourData.properties[key];
+        const behaviour = gameObject.hasBehaviour(behaviourClass)
+            ? gameObject.getBehaviour(behaviourClass)
+            : new behaviourClass();  //如果已经存在该组件，则不再创建
+
+        const behaviourCosntructor = behaviourClass as any;
+        const metadatas = behaviourCosntructor.metadatas || [];
+        for (const metadata of metadatas) {
+            const key = metadata.key;
+            const value = behaviourData.properties[key];
+            if (metadata.type === "number" && typeof value != "number") {
+                throw new Error(behaviourData.type + '的' + key + '属性不是number类型');  //类型检查(不知道为什么${}不行)
+            }
+            (behaviour as any)[key] = value;
         }
         gameObject.addBehaviour(behaviour);
     }

@@ -1,9 +1,9 @@
-import { Behaviour, SerializeField, Transform } from "../engine/engine";
+import { Behaviour, SerializedNumber, Transform } from "../engine/engine";
 
 export class RotateBehaviour extends Behaviour {
-    @SerializeField
+    @SerializedNumber
     velocity = 0;
-    @SerializeField
+    @SerializedNumber
     currentVelocity = 0;
 
     onStart(): void {
