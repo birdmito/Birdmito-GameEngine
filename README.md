@@ -52,6 +52,16 @@
 4. 通过修饰符@Serialized来标记需要序列化的属性  
 5. 反序列化时进行防御性编程，通过使用不同的修饰符（@SerializedNumber or @SerializedString）判断防止反序列化的数据类型和属性类型不匹配  
 6. 未完全解决两个Transform问题  
+##### 2022.12.13
+学习了第十二周代码内容
+1. play模式和edit模式使用相同的数据，不同的运行逻辑，针对此特点，引入了ECS系统，将数据和逻辑分离  
+2. 在GameEngine类中引入了System的相关操作  
+3. 将清屏逻辑和各Renderer渲染逻辑从引擎中抽离为一个RenderingSystem负责管理  
+4. 引入了两种渲染方式：canvas和webgl（webgl渲染方式未完成）  
+5. 将Transform的逻辑从GameObject中抽离为一个TransformSystem负责管理  
+6. 将Behaviour的逻辑从GameObject中抽离为一个BehaviourLifecycleSystem负责管理，并且实现了play模式和edit模式的切换（即是否添加行为生命周期系统）  
+7. 通过回调函数实现visitChildren方法的多态  
+8. 将鼠标点击事件的逻辑从GameObject和GameEngine中抽离为一个MouseControllSystem负责管理，使得GameObject成为微内核  
 #### 使用说明
 ##### 依赖
 1. node.js  
