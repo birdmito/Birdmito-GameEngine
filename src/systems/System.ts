@@ -1,7 +1,8 @@
-import { BitmapRenderer, GameObject, imageCache, TextRenderer, Transform } from "../engine/engine";
+import { BitmapRenderer, GameEngine, GameObject, imageCache, TextRenderer, Transform } from "../engine/engine";
 import { isPointInRectangle, matrixAppendMatrix, matrixInvert, Point, pointAppendMatrix } from "../math";
 
 export class System {
+    gameEngine!: GameEngine;
     rootGameObject!: GameObject;
     onStart() { }
 
@@ -56,7 +57,7 @@ export class MouseControlSystem extends System {
         window.addEventListener("click", (e) => {
             console.log(e.clientX, e.clientY);
             const point = { x: e.clientX, y: e.clientY };
-            const hitTestResult = this.hitTest(this.rootGameObject,point);
+            const hitTestResult = this.hitTest(this.rootGameObject, point);
             let current = hitTestResult;
             //scene
             // A
@@ -79,7 +80,7 @@ export class MouseControlSystem extends System {
             const childTransform = child.getBehaviour(Transform);
             const invertChildMatrix = matrixInvert(childTransform.localMatrix);
             const pointInLocal = pointAppendMatrix(point, invertChildMatrix);
-            const hitTestResult = this.hitTest(child,pointInLocal);
+            const hitTestResult = this.hitTest(child, pointInLocal);
             if (hitTestResult) {
                 return hitTestResult;
             }
@@ -93,6 +94,18 @@ export class MouseControlSystem extends System {
         return null;
     }
 }
+
+//编辑系统
+export class EditorSystem extends System {
+    onStart(): void {
+        runtime.handleGetCurrentMode(() => {
+            return this.gameEngine.mode;
+        });
+    }
+}
+
+//编辑器模式系统
+export class EditorModeSystem extends System { }
 
 //渲染系统(两种渲染方式：Canvas2D和WebGL)
 //------------------------------------------------------

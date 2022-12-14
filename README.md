@@ -62,6 +62,14 @@
 6. 将Behaviour的逻辑从GameObject中抽离为一个BehaviourLifecycleSystem负责管理，并且实现了play模式和edit模式的切换（即是否添加行为生命周期系统）  
 7. 通过回调函数实现visitChildren方法的多态  
 8. 将鼠标点击事件的逻辑从GameObject和GameEngine中抽离为一个MouseControllSystem负责管理，使得GameObject成为微内核  
+##### 2022.12.14
+学习了第十三周代码内容
+1. 引入了electron，实现一个简单的编辑器界面  
+2. 在main.js中引入了electron，并调用vite编译  
+3. 将编辑器和运行时分为两个进程防止运行时崩溃导致编辑器崩溃  
+   · 整个架构分为三个进程：主进程、编辑器进程、运行时进程  
+4. 实现了进程间的通信  
+5. 通过进程通信获取当前模式，实现了编辑器进程和运行时进程的相互切换  
 #### 使用说明
 ##### 依赖
 1. node.js  
@@ -70,6 +78,7 @@
 4. typescript  
 5. TSC  
 6. js-yaml(npm install js-yaml,npm install @types/js-yaml)  
+7. electron(npm install --save-dev electron)  
 
 #### 参与贡献
 

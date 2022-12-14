@@ -7,7 +7,7 @@ import {
     pointAppendMatrix
 } from "../math";
 import yaml from "js-yaml";
-import { BehaviourLifecycleSystem, Canvas2DRenderingSystem, MouseControlSystem, System, TransformSystem, WebGLRenderingSystem } from "../systems/System";
+import { BehaviourLifecycleSystem, Canvas2DRenderingSystem, EditorModeSystem, EditorSystem, MouseControlSystem, System, TransformSystem, WebGLRenderingSystem } from "../systems/System";
 
 //获取画布
 const canvas = document.getElementById("game") as HTMLCanvasElement;
@@ -200,10 +200,20 @@ export class TextRenderer extends RendererBehaviour {
 export class GameEngine {
     rootGameObject = new GameObject();   //根对象
     systems: System[] = [];     //系统列表
+
     mode: "play" | "edit" = "play";    //引擎模式
 
     async start(sceneUrl: string) {
         //引擎启动->加载图片资源->加载场景->解析并创建场景->开始渲染
+
+        const mode = new URL(window.location.href).searchParams.get("mode");  //获取URL参数
+        if(mode === "edit"||mode === "play") {
+            this.mode = mode;
+        }
+        else{
+            throw new Error("mode must be 'edit' or 'play'");
+        }
+
         this.rootGameObject.addBehaviour(new Transform());
 
         const imageList = ["./images/meme.jpg"];    //图片列表
@@ -218,6 +228,10 @@ export class GameEngine {
         if (this.mode === "play") {
             this.addSystem(new BehaviourLifecycleSystem());  //添加行为生命周期系统
         }
+        else if (this.mode === "edit") {
+            this.addSystem(new EditorModeSystem());  //添加编辑模式系统
+        }
+        this.addSystem(new EditorSystem());  //添加编辑器系统
         this.addSystem(new MouseControlSystem()); //添加鼠标控制系统
         //系统初始化
         for (const system of this.systems) {
@@ -234,6 +248,7 @@ export class GameEngine {
 
     addSystem(system: System) {
         system.rootGameObject = this.rootGameObject; //传入游戏根对象
+        system.gameEngine = this;   //传入游戏引擎
         this.systems.push(system);
     }
 
