@@ -98,9 +98,35 @@ export class MouseControlSystem extends System {
 //编辑系统
 export class EditorSystem extends System {
     onStart(): void {
-        runtime.handleGetCurrentMode(() => {
+        //命令逻辑
+        const getAllGameObjectsInfo = () => {
+            const object = this.rootGameObject.children[0];
+
+            function extractGameObjectInfo(object: GameObject) {
+                const result: any = {
+                    name: object.name,
+                    children: [],
+                }
+                for (const child of object.children) {
+                    result.children.push(extractGameObjectInfo(child));
+                }
+                return result;
+            }
+
+            const result = extractGameObjectInfo(object);
+
+            return result;
+        }
+        const getCurrentMode = () => {
             return this.gameEngine.mode;
-        });
+        }
+
+        //注册命令
+        registerCommand(getAllGameObjectsInfo);
+        registerCommand(getCurrentMode);
+
+        //执行命令
+        runtime.handleExecuteCommand();
     }
 }
 
@@ -211,4 +237,8 @@ function visitChildren(gameObject: GameObject, callback: (gameObject: GameObject
     for (const child of gameObject.children) {
         visitChildren(child, callback);
     }
+}
+//注册命令
+function registerCommand(command: Function) {
+    runtime.registerCommand(command.name, command);
 }

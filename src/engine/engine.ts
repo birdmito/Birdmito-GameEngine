@@ -48,6 +48,7 @@ function loadText(url: string) {
 //-----------------------------------------------------------------
 //#region GameObject
 export class GameObject {   //经过ECS重构后的GameObject成为微内核，仅提供多叉树和Behavior的基本操作
+    name: string = "";   //名称
     parent: GameObject | null = null;   //父对象
     children: GameObject[] = [];   //子对象
     behaviours: Behaviour[] = [];    //Behavior组件组
@@ -284,6 +285,7 @@ export class GameEngine {
 //#region Serialization and Deserialization Functions
 export function createGameObject(data: any): GameObject {       //封装
     const gameObject = new GameObject();
+    gameObject.name = data.name;
     for (const behaviourData of data.behaviours) {   //遍历创建behaviours
         const className = behaviourData.type;
         const behaviourClass = behaviourMap.get(className)!;        //多态
@@ -312,6 +314,7 @@ export function createGameObject(data: any): GameObject {       //封装
 }
 export function extractGameObject(gameObject: GameObject): any {   //反序列化
     const data: any = {
+        name: gameObject.name,
         behaviours: [],
         children: [],
     };

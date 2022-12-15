@@ -3,5 +3,5 @@ console.log('preload');
 contextBridge.exposeInMainWorld('editor', {
     changeMode: (mode) => ipcRenderer.invoke('changeMode', mode),
 
-    getCurrentMode: () => ipcRenderer.invoke('getCurrentMode'),
+    executeCommand: (command) => ipcRenderer.invoke('executeCommand', command)
 })

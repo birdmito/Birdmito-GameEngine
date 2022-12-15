@@ -1,3 +1,4 @@
+name: Root
 behaviours:
   - type: Transform
     properties:
@@ -7,7 +8,8 @@ behaviours:
       scaleY: 1
       rotation: 0
 children:
-  - behaviours:
+  - name: boss
+    behaviours:
       - type: Transform
         properties:
           x: 658
@@ -30,10 +32,11 @@ children:
         properties:
           text: boss
     children: []
-  - behaviours:
+  - name: MainRole
+    behaviours:
       - type: Transform
         properties:
-          x: 0
+          x: 659
           y: 0
           scaleX: 1
           scaleY: 1
@@ -50,7 +53,8 @@ children:
           velocity: 2
           currentVelocity: 2
     children: []
-  - behaviours:
+  - name: Building
+    behaviours:
       - type: Transform
         properties:
           x: 658
@@ -61,7 +65,7 @@ children:
       - type: Transform
         properties:
           x: 658
-          y: 1000
+          y: 400
           scaleX: 1
           scaleY: 1
           rotation: 0
@@ -69,7 +73,8 @@ children:
         properties:
           text: Building
     children: []
-  - behaviours:
+  - name: meme1
+    behaviours:
       - type: Transform
         properties:
           x: 0
@@ -83,9 +88,10 @@ children:
       - type: LoopMoveBehaviour
         properties:
           velocity: 2
-          moveRange: 1261
+          moveRange: 621
     children: []
-  - behaviours:
+  - name: meme2
+    behaviours:
       - type: Transform
         properties:
           x: 0

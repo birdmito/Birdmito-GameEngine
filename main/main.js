@@ -17,13 +17,14 @@ const createWindow = async () => {
         console.log('change mode:' + mode);
         browserView.webContents.loadURL('http://localhost:5173/?mode=' + mode);
     });
-    ipcMain.handle('getCurrentMode', async (event) => {
+    ipcMain.handle("executeCommand", (event, command) => {
+        console.log('execute command:' + command);
         return new Promise((resolve) => {
-            ipcMain.on('getCurrentModeResult', (event, value) => {
+            ipcMain.on('executeCommandResult', (_event, value) => {
                 console.log(value);
                 resolve(value);
             });
-            browserView.webContents.send('getCurrentMode');
+            browserView.webContents.send('executeCommand', command);
         });
     });
 
@@ -46,7 +47,7 @@ const createWindow = async () => {
         }
     })
     mainWindow.setBrowserView(browserView)
-    browserView.setBounds({ x: 100, y: 100, width: 1280, height: 720 })
+    browserView.setBounds({ x: 100, y: 200, width: 1280, height: 720 })
     browserView.webContents.loadURL('http://localhost:5173/?mode=edit')
 
     // 打开开发工具
