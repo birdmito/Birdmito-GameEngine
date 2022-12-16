@@ -6,7 +6,7 @@ let currentCommandId = 0;
 contextBridge.exposeInMainWorld('editor', {
     changeMode: (mode) => ipcRenderer.invoke('changeMode', mode),
 
-    save: (url, content) => ipcRenderer.invoke('save', url, content),
+    saveScene: (url, content) => ipcRenderer.invoke('saveScene', url, content),
 
     executeCommand: (command) => {
         currentCommandId++;

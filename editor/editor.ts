@@ -11,7 +11,7 @@ const saveSceneButton = document.getElementById("save-scene-button")!;
 saveSceneButton.addEventListener("click", async () => {
     const serializedScene = await editor.executeCommand({ command: "getSerializedScene" });
     console.log(serializedScene);
-    await editor.saveScene("scene.yaml", serializedScene);
+    await editor.saveScene("./scene.yaml", serializedScene);
 });
 
 //层级树可视化

@@ -37,8 +37,8 @@ const createWindow = async () => {
         }
     });
 
-ipcMain.handle('save', (event, url, content) => {
-    console.log('save' ,url, content);
+ipcMain.handle('saveScene', (event, url, content) => {
+    console.log('saveScene' ,url, content);
     const fs = require('fs');
     fs.writeFileSync(url, content);
 });
