@@ -3,18 +3,22 @@ console.log('preload');
 let commandMap = new Map();
 
 contextBridge.exposeInMainWorld('runtime', {
-    registerCommand: (commandName,command) => {
-        commandMap.set(commandName, command);
+    registerCommand: (commandName, commandFunction) => {
+        commandMap.set(commandName, commandFunction);
     },
 
     handleExecuteCommand: () => {
         ipcRenderer.on('executeCommand', (event, command) => {
-            const callback = commandMap.get(command.command);
-            if(callback){
-                const result = callback(command.command);
+            const commandFunction = commandMap.get(command.command);
+            if (commandFunction) {
+                const data = commandFunction(command.param);
+                const result ={
+                    id: command.id,
+                    data,
+                }
                 ipcRenderer.send('executeCommandResult', result);
             }
-            else{
+            else {
                 alert(JSON.stringify(command) + " not found");
             }
             //const result = callback(command);

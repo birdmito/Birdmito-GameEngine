@@ -54,8 +54,19 @@ export class GameObject {   //经过ECS重构后的GameObject成为微内核，�
     behaviours: Behaviour[] = [];    //Behavior组件组
     renderer: RendererBehaviour | null = null;      //渲染器
     onClick: Function | undefined;        //点击判断
+    id: number = 0;    //ID
 
-    constructor() { }
+    static CURRENT_ID = 0;    //当前ID
+    static maps = new Map<number, GameObject>();    //ID与GameObject的映射
+    static getGameObjectById(id: number) {    //根据ID获取GameObject
+        return GameObject.maps.get(id);
+    }
+
+    constructor() {
+        this.id = GameObject.CURRENT_ID++;
+        this.name = `GameObject${this.id}`;
+        GameObject.maps.set(this.id, this);
+    }
 
     //多叉树方法
     addChild(child: GameObject) {   //添加子对象
@@ -208,10 +219,10 @@ export class GameEngine {
         //引擎启动->加载图片资源->加载场景->解析并创建场景->开始渲染
 
         const mode = new URL(window.location.href).searchParams.get("mode");  //获取URL参数
-        if(mode === "edit"||mode === "play") {
+        if (mode === "edit" || mode === "play") {
             this.mode = mode;
         }
-        else{
+        else {
             throw new Error("mode must be 'edit' or 'play'");
         }
 

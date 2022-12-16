@@ -17,16 +17,31 @@ const createWindow = async () => {
         console.log('change mode:' + mode);
         browserView.webContents.loadURL('http://localhost:5173/?mode=' + mode);
     });
+
+    let commands = {};  //命令集
+
     ipcMain.handle("executeCommand", (event, command) => {
         console.log('execute command:' + command);
         return new Promise((resolve) => {
-            ipcMain.on('executeCommandResult', (_event, value) => {
-                console.log(value);
-                resolve(value);
-            });
+            commands[command.id] = resolve;
             browserView.webContents.send('executeCommand', command);
         });
     });
+
+    ipcMain.on('executeCommandResult', (_event, value) => {
+        console.log(value);
+        if (commands[value.id]) { //防止多个命令同时执行时，命令结果错乱
+            const resolve = commands[value.id];
+            delete commands[value.id];
+            resolve(value.data);
+        }
+    });
+
+ipcMain.handle('save', (event, url, content) => {
+    console.log('save' ,url, content);
+    const fs = require('fs');
+    fs.writeFileSync(url, content);
+});
 
     // Create the browser window.
     const mainWindow = new BrowserWindow({
@@ -35,7 +50,8 @@ const createWindow = async () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }
-    })
+    });
+    mainWindow.maximize();  //最大化
 
     // 加载 editor.html
     mainWindow.loadURL('http://localhost:5173/editor.html')
@@ -47,11 +63,12 @@ const createWindow = async () => {
         }
     })
     mainWindow.setBrowserView(browserView)
-    browserView.setBounds({ x: 100, y: 200, width: 1280, height: 720 })
+    browserView.setBounds({ x: 200, y: 200, width: 1280, height: 720 })
     browserView.webContents.loadURL('http://localhost:5173/?mode=edit')
 
     // 打开开发工具
-    mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools({ mode: "right" })
+    browserView.webContents.openDevTools({ mode: "undocked" })
 }
 
 // 这段程序将会在 Electron 结束初始化

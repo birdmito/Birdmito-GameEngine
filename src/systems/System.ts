@@ -104,7 +104,8 @@ export class EditorSystem extends System {
 
             function extractGameObjectInfo(object: GameObject) {
                 const result: any = {
-                    name: object.name,
+                    id: object.id,
+                    name: object.name + " " + object.id,
                     children: [],
                 }
                 for (const child of object.children) {
@@ -120,10 +121,49 @@ export class EditorSystem extends System {
         const getCurrentMode = () => {
             return this.gameEngine.mode;
         }
+        const getGameObjectInfo = (param: { id: number }) => {
+            const gameObject = GameObject.getGameObjectById(param.id)!;
+            const viewModel = {
+                name: gameObject.name,
+                behaviours: gameObject.behaviours.map((behaviour) => {
+                    const metadatas = (behaviour as any).constructor.metadatas || [];
+                    return {
+                        name: behaviour.constructor.name,
+                        properties: metadatas.map((metadata: any) => {
+                            return {
+                                name: metadata.key,
+                                type: metadata.type,
+                                value: (behaviour as any)[metadata.key],
+                            }
+                        })
+                    }
+                },)
+            };
+
+            return viewModel;
+        }
+        const modifyBehaviourProperty = (param: {
+            id: number,
+            behaviourName: string,
+            propertyName: string,
+            value: any,
+        }) => {
+            const gameObject = GameObject.getGameObjectById(param.id)!;
+            const behaviour = gameObject.behaviours.find((behaviour) => {
+                return behaviour.constructor.name === param.behaviourName;
+            });
+            (behaviour as any)[param.propertyName] = param.value;
+        }
+        const getSerializedScene = () => {
+            return this.gameEngine.serialize();
+        }
 
         //注册命令
         registerCommand(getAllGameObjectsInfo);
         registerCommand(getCurrentMode);
+        registerCommand(getGameObjectInfo);
+        registerCommand(modifyBehaviourProperty);
+        registerCommand(getSerializedScene);
 
         //执行命令
         runtime.handleExecuteCommand();

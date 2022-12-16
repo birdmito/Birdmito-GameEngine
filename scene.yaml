@@ -17,13 +17,6 @@ children:
           scaleX: 1
           scaleY: 1
           rotation: 0
-      - type: Transform
-        properties:
-          x: 658
-          y: 658
-          scaleX: 1
-          scaleY: 1
-          rotation: 0
       - type: MoveWhenClickBehaviour
         properties:
           velocity: 1
@@ -58,13 +51,6 @@ children:
       - type: Transform
         properties:
           x: 658
-          y: 1000
-          scaleX: 1
-          scaleY: 1
-          rotation: 0
-      - type: Transform
-        properties:
-          x: 658
           y: 400
           scaleX: 1
           scaleY: 1
@@ -92,13 +78,6 @@ children:
     children: []
   - name: meme2
     behaviours:
-      - type: Transform
-        properties:
-          x: 0
-          y: 658
-          scaleX: 1
-          scaleY: 1
-          rotation: 0
       - type: Transform
         properties:
           x: 0
