@@ -13,17 +13,17 @@ children:
       - type: Transform
         properties:
           x: 658
-          y: 658
+          y: 600
           scaleX: 1
           scaleY: 1
           rotation: 0
       - type: MoveWhenClickBehaviour
         properties:
-          velocity: 1
+          velocity: 2
           currentVelocity: 0
       - type: TextRenderer
         properties:
-          text: boss
+          text: Boss
     children: []
   - name: MainRole
     behaviours:
@@ -33,7 +33,7 @@ children:
           y: 0
           scaleX: 1
           scaleY: 1
-          rotation: 296
+          rotation: 0
       - type: TextRenderer
         properties:
           text: MainRole
@@ -82,8 +82,8 @@ children:
         properties:
           x: 0
           y: 658
-          scaleX: 1
-          scaleY: 1
+          scaleX: 0.1
+          scaleY: 0.1
           rotation: 0
       - type: BitmapRenderer
         properties:

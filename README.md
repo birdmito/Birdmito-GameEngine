@@ -83,6 +83,7 @@
 4. 实现了点击层级树中的对象，Inspector面板显示对应对象的属性  
 5. 实现了Inspector面板中的属性修改  
 6. 实现了场景信息的保存  
+7. 修复了两个TransformSystem的bug  
 #### 使用说明
 ##### 依赖
 1. node.js  
