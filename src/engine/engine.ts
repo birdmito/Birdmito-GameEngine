@@ -1,11 +1,4 @@
-import {
-    isPointInRectangle,
-    Matrix,
-    matrixAppendMatrix,
-    matrixInvert,
-    Point,
-    pointAppendMatrix
-} from "../math";
+import { Matrix, } from "../math";
 import yaml from "js-yaml";
 import { BehaviourLifecycleSystem, Canvas2DRenderingSystem, EditorModeSystem, EditorSystem, MouseControlSystem, System, TransformSystem, WebGLRenderingSystem } from "../systems/System";
 
