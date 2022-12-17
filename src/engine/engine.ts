@@ -106,7 +106,7 @@ export class GameObject {   //经过ECS重构后的GameObject成为微内核，�
                 return behaviour as InstanceType<T>;    //返回该类型实例
             }
         }
-        throw new Error('Behaviour ${behaviourClass.name} not found');
+        throw new Error(`Behaviour ${behaviourClass.name} not found`);
     }
     //删除Behavior组件
     removeBehaviour(behaviour: Behaviour) {
