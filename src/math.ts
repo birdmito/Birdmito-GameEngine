@@ -27,10 +27,10 @@ export class Matrix {
         let skewX, skewY;
         skewX = skewY = (rotation * Math.PI) / 180;
 
-        this.a = Math.cos(skewY) * scaleX;
-        this.b = Math.sin(skewY) * scaleX;
-        this.c = -Math.sin(skewX) * scaleY;
-        this.d = Math.cos(skewX) * scaleY;
+        this.a = Math.cos(skewY) * scaleX;  //cos(skewY) = cos(rotation)
+        this.b = Math.sin(skewY) * scaleX;  //sin(skewY) = sin(rotation)
+        this.c = -Math.sin(skewX) * scaleY; //sin(skewX) = -sin(rotation)
+        this.d = Math.cos(skewX) * scaleY;  //cos(skewX) = cos(rotation)
     }
 
 }

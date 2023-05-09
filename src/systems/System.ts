@@ -64,7 +64,7 @@ export class MouseControlSystem extends System {
             // |-- B
             // |--|-- C
             // |-- D
-            //冒泡机制,点击C，会触发C，B，A，scene的点击事件
+            //冒泡机制,点击C，会触发C，B，A的点击事件
             while (current) {
                 if (current.onClick) {
                     current.onClick();
