@@ -128,3 +128,4 @@ setTimeout(() => {
     hierarchyTreeView.update();
     inspectorView = new InspectorView();
 }, 1000);
+
