@@ -229,7 +229,7 @@ export class GameEngine {
         //添加系统
         this.addSystem(new TransformSystem());  //添加变换系统
         this.addSystem(new Canvas2DRenderingSystem(canvas));  //添加Canvas2D渲染系统
-        //this.addSystem(new WebGLRenderingSystem(canvas));  //添加WebGL渲染系统
+        //this.addSystem(new WebGLRenderingSystem(canvas));  //添加WebGL2渲染系统
         if (this.mode === "play") {
             this.addSystem(new BehaviourLifecycleSystem());  //添加行为生命周期系统
         }
