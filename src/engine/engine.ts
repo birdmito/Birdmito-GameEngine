@@ -186,7 +186,7 @@ export class TextRenderer extends RendererBehaviour {
     @SerializedString
     text = "Hello world";
     @SerializedNumber
-    fontSize:number = 20;
+    fontSize: number = 20;
     textWidth = 0;
 
     getBounds() {
@@ -223,7 +223,7 @@ export class GameEngine {
 
         this.rootGameObject.addBehaviour(new Transform());
 
-        const imageList = ["./images/meme.jpg"];    //图片列表
+        const imageList = ["images/background.jpg"];    //图片列表
         for (const item of imageList) {    //加载图片
             await loadImage(item);
         }

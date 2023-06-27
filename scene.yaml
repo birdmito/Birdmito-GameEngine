@@ -8,6 +8,19 @@ behaviours:
       scaleY: 1
       rotation: 0
 children:
+  - name: Background
+    behaviours:
+      - type: Transform
+        properties:
+          x: 0
+          y: 0
+          scaleX: 2
+          scaleY: 1.2
+          rotation: 0
+      - type: BitmapRenderer
+        properties:
+          image: images/background.jpg
+    children: []
   - name: GameTitle
     behaviours:
       - type: Transform
