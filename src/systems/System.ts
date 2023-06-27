@@ -219,7 +219,8 @@ export class Canvas2DRenderingSystem extends System {
                     //将文本渲染器中的onUpdate()方法中的代码移到这里了
                     const textRenderer = child.renderer;
                     //设置文本样式
-                    context.font = "30px Arial";
+                    context.font = textRenderer.fontSize.toString() + "px Arial";
+                    console.log(textRenderer.fontSize.toString() + "px Arial");
                     context.fillStyle = "#000000";
                     context.textAlign = "left";
                     //context.fillText(this.text, this.x, this.y + 30);  //未采用局部矩阵时需要加上偏移量
@@ -266,36 +267,36 @@ export class WebGLRenderingSystem extends System {
         visitChildren(this.rootGameObject, (child) => {
             if (child.renderer) {
                 //渲染逻辑...
-                if(child.renderer instanceof BitmapRenderer) {
+                if (child.renderer instanceof BitmapRenderer) {
                     //...
                     const image = imageCache.get(child.renderer.image);
 
                     var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)!;
                     var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)!;
-            
+
                     var program = createProgram(gl, vertexShader, fragmentShader)!;
-            
+
                     var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
                     var texCoordAttributeLocation = gl.getAttribLocation(program, "a_texCoord");
-            
+
                     var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
                     var imageLocation = gl.getUniformLocation(program, "u_image");
-            
+
                     var vao = gl.createVertexArray();
                     gl.bindVertexArray(vao);
-            
+
                     var positionBuffer = gl.createBuffer();
                     gl.enableVertexAttribArray(positionAttributeLocation);
-            
+
                     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-            
+
                     var size = 2;          // 2 components per iteration
                     var type = gl.FLOAT;   // the data is 32bit floats
                     var normalize = false; // don't normalize the data
                     var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
                     var offset = 0;        // start at the beginning of the buffer
                     gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
-            
+
                     var texCoordBuffer = gl.createBuffer();
                     gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
@@ -305,20 +306,20 @@ export class WebGLRenderingSystem extends System {
                         0.0, 1.0,
                         1.0, 0.0,
                         1.0, 1.0]), gl.STATIC_DRAW);
-            
+
                     gl.enableVertexAttribArray(texCoordAttributeLocation);
-            
+
                     gl.vertexAttribPointer(texCoordAttributeLocation, size, type, normalize, stride, offset);
-            
+
                     var texture = gl.createTexture();
                     gl.activeTexture(gl.TEXTURE0 + 0);
                     gl.bindTexture(gl.TEXTURE_2D, texture);
-            
+
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);  //设置纹理水平填充方式
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);  //设置纹理垂直填充方式
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);    //设置纹理缩小时的填充方式
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);    //设置纹理放大时的填充方式
-                    
+
                     var mipLevel = 0;               // the largest mip
                     var internalFormat = gl.RGBA;   // format we want in the texture
                     var srcFormat = gl.RGBA;        // format of data we are supplying

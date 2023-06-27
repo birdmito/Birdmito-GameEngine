@@ -8,12 +8,26 @@ behaviours:
       scaleY: 1
       rotation: 0
 children:
-  - name: boss
+  - name: GameTitle
     behaviours:
       - type: Transform
         properties:
-          x: 658
-          y: 600
+          x: 400
+          y: 250
+          scaleX: 1
+          scaleY: 1
+          rotation: 0
+      - type: TextRenderer
+        properties:
+          text: Arcane Era
+          fontSize: 100
+    children: []
+  - name: StartButton
+    behaviours:
+      - type: Transform
+        properties:
+          x: 580
+          y: 360
           scaleX: 1
           scaleY: 1
           rotation: 0
@@ -23,69 +37,6 @@ children:
           currentVelocity: 0
       - type: TextRenderer
         properties:
-          text: Boss
-    children: []
-  - name: MainRole
-    behaviours:
-      - type: Transform
-        properties:
-          x: 659
-          y: 0
-          scaleX: 1
-          scaleY: 1
-          rotation: 0
-      - type: TextRenderer
-        properties:
-          text: MainRole
-      - type: MoveWhenClickBehaviour
-        properties:
-          velocity: 2
-          currentVelocity: 0
-      - type: RotateBehaviour
-        properties:
-          velocity: 2
-          currentVelocity: 2
-    children: []
-  - name: Building
-    behaviours:
-      - type: Transform
-        properties:
-          x: 658
-          y: 400
-          scaleX: 1
-          scaleY: 1
-          rotation: 0
-      - type: TextRenderer
-        properties:
-          text: Building
-    children: []
-  - name: meme1
-    behaviours:
-      - type: Transform
-        properties:
-          x: 0
-          y: 0
-          scaleX: 1
-          scaleY: 1
-          rotation: 0
-      - type: BitmapRenderer
-        properties:
-          image: ./images/meme.jpg
-      - type: LoopMoveBehaviour
-        properties:
-          velocity: 2
-          moveRange: 621
-    children: []
-  - name: meme2
-    behaviours:
-      - type: Transform
-        properties:
-          x: 0
-          y: 658
-          scaleX: 0.1
-          scaleY: 0.1
-          rotation: 0
-      - type: BitmapRenderer
-        properties:
-          image: ./images/meme.jpg
+          text: Start Game
+          fontSize: 30
     children: []

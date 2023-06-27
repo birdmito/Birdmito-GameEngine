@@ -185,6 +185,8 @@ export class TextRenderer extends RendererBehaviour {
     //定义初始内容
     @SerializedString
     text = "Hello world";
+    @SerializedNumber
+    fontSize:number = 20;
     textWidth = 0;
 
     getBounds() {
