@@ -75,6 +75,9 @@ export class GameObject {   //经过ECS重构后的GameObject成为微内核，�
             child.parent = null;
         }
     }
+    getChildren(): GameObject {   //获取子对象
+        return this.children[1];
+    }
 
     //添加Behavior组件（把变化的与不变化的分开，从子类中共通的提取到基类中）
     addBehaviour(behaviour: Behaviour) {
@@ -225,7 +228,7 @@ export class GameEngine {
 
         this.rootGameObject.addBehaviour(new Transform());
 
-        const imageList = ["images/background.jpg"];    //图片列表
+        const imageList = ["assets/images/background.jpg"];    //图片列表
         for (const item of imageList) {    //加载图片
             await loadImage(item);
         }
@@ -251,6 +254,7 @@ export class GameEngine {
         //反序列化
         const content = await loadText(sceneUrl);  //加载场景配置文件
         this.unserialize(content);  //解析场景配置文件
+
 
         requestAnimationFrame(() => this.onUpdate());
 

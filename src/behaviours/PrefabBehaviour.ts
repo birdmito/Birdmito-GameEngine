@@ -5,9 +5,9 @@ export class PrefabBehaviour extends Behaviour {
     prefabUrl = "";
 
     async onStart() {
-       this.gameObject.addChild(await instantiate(this.prefabUrl));
+        this.gameObject.addChild(await instantiate(this.prefabUrl));
     }
     onUpdate() {
-        
+
     }
 }

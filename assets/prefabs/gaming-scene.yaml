@@ -1,4 +1,4 @@
-name: Prefab
+name: Root
 behaviours:
   - type: Transform
     properties:
@@ -8,7 +8,7 @@ behaviours:
       scaleY: 1
       rotation: 0
 children:
-  - name: GameTitle
+  - name: Canvas
     behaviours:
       - type: Transform
         properties:
@@ -17,8 +17,7 @@ children:
           scaleX: 1
           scaleY: 1
           rotation: 0
-      - type: TextRenderer
+      - type: PrefabBehaviour
         properties:
-          text: Main map
-          fontSize: 170
+          prefabUrl: "assets/prefabs/A_CanvasDemo.yaml"
     children: []

@@ -17,8 +17,6 @@ children:
           scaleX: 0
           scaleY: 0
           rotation: 0
-      - type: WorldBehaviour
-        properties:
     children: []
   - name: GameTitle
     behaviours:
@@ -43,10 +41,7 @@ children:
           scaleX: 1
           scaleY: 1
           rotation: 0
-      - type: MoveWhenClickBehaviour
-        properties:
-          velocity: 2
-          currentVelocity: 0
+      - type: StartGameWhenClickBehaviour
       - type: TextRenderer
         properties:
           text: Start Game
