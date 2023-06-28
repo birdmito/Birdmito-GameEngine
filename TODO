@@ -10,4 +10,8 @@
     层级树与属性面板;
         ✔ 查看运行时中的信息 @done(22-12-16 01:54)
         ✔ 编辑运行时中的信息 @done(22-12-16 22:28)
-    
+
+Prefab功能：
+    通过.yaml文件存储预制体信息
+    通过预制体生成GameObject
+    生成的gameObject可以添加到挂载Behaviour的GameObject的子节点中this.gameObject.addChild()

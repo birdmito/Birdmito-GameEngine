@@ -8,6 +8,7 @@ import {
 import { MoveWhenClickBehaviour } from "./behaviours/MoveWhenClickBehaviour";
 import { RotateBehaviour } from "./behaviours/RotateBehaviour";
 import { LoopMoveBehaviour } from "./behaviours/LoopMoveBehaviour";
+import { PrefabBehaviour } from "./behaviours/PrefabBehaviour";
 
 //每添加一个Behaviour，都需要在这里注册
 //------------------------------------------------------------
@@ -18,6 +19,7 @@ registerBehaviour(TextRenderer);
 registerBehaviour(MoveWhenClickBehaviour);
 registerBehaviour(RotateBehaviour);
 registerBehaviour(LoopMoveBehaviour);
+registerBehaviour(PrefabBehaviour);
 
 //游戏引擎实例
 //---------------------------------------------------------------

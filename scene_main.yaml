@@ -1,0 +1,24 @@
+name: Prefab
+behaviours:
+  - type: Transform
+    properties:
+      x: 0
+      y: 0
+      scaleX: 1
+      scaleY: 1
+      rotation: 0
+children:
+  - name: GameTitle
+    behaviours:
+      - type: Transform
+        properties:
+          x: 400
+          y: 250
+          scaleX: 1
+          scaleY: 1
+          rotation: 0
+      - type: TextRenderer
+        properties:
+          text: Main map
+          fontSize: 170
+    children: []

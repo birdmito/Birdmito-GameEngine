@@ -1,4 +1,5 @@
-import { Behaviour, SerializedNumber, Transform } from "../engine/engine";
+import { Behaviour, SerializedNumber, Transform, instantiate } from "../engine/engine";
+import { SceneManagementSystem } from "../systems/SceneManagementSystem";
 
 export class StartGameWhenClickBehaviour extends Behaviour {
     //点击后开始游戏
@@ -12,7 +13,7 @@ export class StartGameWhenClickBehaviour extends Behaviour {
     }
     onUpdate() {
         if (this.isClick) {
-            const transform = this.gameObject.getBehaviour(Transform);
+            
         }
     }
 }

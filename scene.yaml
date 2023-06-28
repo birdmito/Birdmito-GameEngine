@@ -21,6 +21,9 @@ children:
         properties:
           text: Arcane Era
           fontSize: 100
+      - type: PrefabBehaviour
+        properties:
+          prefabUrl: "./scene_main.yaml"
     children: []
   - name: StartButton
     behaviours:

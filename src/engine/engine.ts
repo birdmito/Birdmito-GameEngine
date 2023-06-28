@@ -1,6 +1,7 @@
 import { Matrix, } from "../math";
 import yaml from "js-yaml";
 import { BehaviourLifecycleSystem, Canvas2DRenderingSystem, EditorModeSystem, EditorSystem, MouseControlSystem, System, TransformSystem, WebGLRenderingSystem } from "../systems/System";
+import { SceneManagementSystem } from "../systems/SceneManagementSystem";
 
 //获取画布
 const canvas = document.getElementById("game") as HTMLCanvasElement;
@@ -25,7 +26,7 @@ function loadImage(url: string) {
     });
 }
 //定义加载文本函数
-function loadText(url: string) {
+export function loadText(url: string) {
     return new Promise<string>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
@@ -240,6 +241,7 @@ export class GameEngine {
         }
         this.addSystem(new EditorSystem());  //添加编辑器系统
         this.addSystem(new MouseControlSystem()); //添加鼠标控制系统
+        this.addSystem(new SceneManagementSystem()); //添加场景管理系统
         //系统初始化
         for (const system of this.systems) {
             system.onStart();
@@ -342,3 +344,9 @@ export function extractGameObject(gameObject: GameObject): any {   //反序列�
     return data;
 }
 //#endregion Serialization and Deserialization Functions
+
+export async function instantiate(prefabUrl: string): Promise<GameObject> {
+    const content = await loadText(prefabUrl);
+    const data = yaml.load(content);
+    return createGameObject(data);
+}
