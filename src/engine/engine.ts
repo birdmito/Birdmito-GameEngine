@@ -1,5 +1,6 @@
 import { Matrix, } from "../math";
 import yaml from "js-yaml";
+import * as fs from 'fs';
 import { BehaviourLifecycleSystem, Canvas2DRenderingSystem, EditorModeSystem, EditorSystem, MouseControlSystem, System, TransformSystem, WebGLRenderingSystem } from "../systems/System";
 
 //获取画布
