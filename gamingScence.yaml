@@ -17,8 +17,9 @@ children:
           scaleX: 0
           scaleY: 0
           rotation: 0
-      - type: WorldBehaviour
+      - type: BitmapRenderer
         properties:
+          image: images/background.jpg
     children: []
   - name: GameTitle
     behaviours:
